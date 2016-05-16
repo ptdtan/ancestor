@@ -37,5 +37,8 @@ int main(int argc, char *argv[])
     BamTools::BamAlignment al;
     //do the job
     while ( reader.GetNextAlignment(al) ){
-		if (al.isProperPair())
+		if (al.IsProperPair())
         std::cout << abs(al.InsertSize) << "\n";
+	}
+}
+
