@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     //do the job
     while ( reader.GetNextAlignment(al) ){
 		if (al.MatePosition > uRend){
-            cout  << (unsigned long)al.Position << "\t" <<(unsigned long)al.MatePosition << endl;
+            //cout  << (unsigned long)al.Position << "\t" <<(unsigned long)al.MatePosition << endl;
 			sumInsertsize+=abs(al.InsertSize)-uGap;
             count++;
         }
