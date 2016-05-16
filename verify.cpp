@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <iostream>
 #include <sstream>
 #include "api/api_global.h"
@@ -9,7 +11,7 @@ using namespace BamTools;
 int main(int argc, char *argv[])
 {
     //unsigned short count;
-    int32_t uRstart, uLen, uRend uGap, uMean;
+    int32_t uRstart, uLen, uRend, uGap, uMean;
     int count=0;
     unsigned short sumInsertsize=0;
     std::string filename = argv[1], chr = argv[2];
@@ -32,7 +34,7 @@ int main(int argc, char *argv[])
         return -1;
         }
     int RefID = reader.GetReferenceID(chr);
-    BamTools::BamRegion region(RefID, uGstart, RefID, uGend);
+    BamTools::BamRegion region(RefID, uRstart, RefID, uRend);
 
     reader.SetRegion(region);
 
@@ -40,10 +42,11 @@ int main(int argc, char *argv[])
     //do the job
     while ( reader.GetNextAlignment(al) ){
 		if (al.MatePosition > uRend){
-            sumInsertsize+=abs(al.InsertSize)-uGap;
+            cout  << (unsigned long)al.Position << "\t" <<(unsigned long)al.MatePosition << endl;
+			sumInsertsize+=abs(al.InsertSize)-uGap;
             count++;
         }
 	}
-	std::cout << std::fixed <<std::setprecision(3) << sumInsertsize/count;
+	std::cout << std::fixed << sumInsertsize/count;
 }
 
