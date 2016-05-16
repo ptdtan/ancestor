@@ -8,16 +8,18 @@ using namespace BamTools;
 
 int main(int argc, char *argv[])
 {
-    unsigned short count;
-    //std::string filename, idxname;
-    int32_t uGstart, uGend;
+    //unsigned short count;
+    int32_t uRstart, uLen, uRend uGap, uMean;
+    int count=0;
+    unsigned short sumInsertsize=0;
     std::string filename = argv[1], chr = argv[2];
     BamTools::BamReader reader;
 
-    std::stringstream str1(argv[3]);
-    str1 >> uGstart;
-    std::stringstream str2(argv[4]);
-    str2 >> uGend;
+    std::stringstream(argv[3]) >> uRstart;
+    std::stringstream(argv[4]) >> uLen;
+    std::stringstream(argv[5]) >> uGap;
+    std::stringstream(argv[6]) >> uMean;
+    uRend = uRstart + uLen;
 
     //open BAM and its index
     if (!reader.Open(filename)){
@@ -37,8 +39,11 @@ int main(int argc, char *argv[])
     BamTools::BamAlignment al;
     //do the job
     while ( reader.GetNextAlignment(al) ){
-		if (al.IsProperPair())
-        std::cout << abs(al.InsertSize) << "\n";
+		if (al.MatePosition > uRend){
+            sumInsertsize+=abs(al.InsertSize)-uGap;
+            count++;
+        }
 	}
+	std::cout << std::fixed <<std::setprecision(3) << sumInsertsize/count;
 }
 
