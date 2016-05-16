@@ -8,6 +8,17 @@
 using namespace std;
 using namespace BamTools;
 
+float stdev(int32_t *arrInserts){
+    int32_t len = sizeof(*arrInserts)/sizeof(int32_t), sum;
+    int i;
+    float mean, sumstd;
+    for(i=0; i<len; i++)
+        sum+=arrInserts[i];
+    mean = sum/len;
+    for(i=0; i<len; i++)
+        sumstd+=(arrInserts[i]-mean)*(arrInserts[i]-mean);
+    return sqrt(sumstd/len)
+
 int main(int argc, char *argv[])
 {
     //unsigned short count;
@@ -19,8 +30,6 @@ int main(int argc, char *argv[])
 
     std::stringstream(argv[3]) >> uRstart;
     std::stringstream(argv[4]) >> uLen;
-    std::stringstream(argv[5]) >> uGap;
-    std::stringstream(argv[6]) >> uMean;
     uRend = uRstart + uLen;
 
     //open BAM and its index
@@ -42,7 +51,7 @@ int main(int argc, char *argv[])
     //do the job
     while ( reader.GetNextAlignment(al) ){
 		if (al.MatePosition > uRend){
-            cout  << (unsigned long)al.Position << "\t" <<(unsigned long)al.MatePosition << endl;
+
 			sumInsertsize+=abs(al.InsertSize)-uGap;
             count++;
         }
