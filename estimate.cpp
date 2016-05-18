@@ -4,29 +4,39 @@
 #include <sstream>
 #include <map>
 #include <string>
+#include <utility>
+#include <cmath>
 #include "api/api_global.h"
 #include "api/BamReader.h"
 
 using namespace std;
 using namespace BamTools;
 
-pair<float, float> stdev(int32_t *arrInserts){
-    int32_t len = sizeof(*arrInserts)/sizeof(int32_t), sum;
-    int i;
-    float mean, sumstd;
-    for(i=0; i<len; i++)
+float *stdev(int32_t *arrInserts, int len){
+    //int32_t len = sizeof(*arrInserts)/sizeof(int32_t), sum;
+	int32_t sum=0;
+    //cout << len;
+	int i;
+    float *ret, mean, sumstd=0.0;
+    ret = (float *)calloc(2,sizeof(float));
+	for(i=0; i<len; i++){
+		//cout << arrInserts[i] << endl;
         sum+=arrInserts[i];
+	}
     mean = sum/len;
+	ret[0] =mean;
     for(i=0; i<len; i++)
         sumstd+=(arrInserts[i]-mean)*(arrInserts[i]-mean);
-    return pair<float, float>(mean, sqrt(sumstd/len));
-
+	ret[1] = sqrt(sumstd/len);
+    return ret;
+}
 int main(int argc, char *argv[])
 {
     //unsigned short count;
     int32_t uRstart, uLen, uRend, uGap, uMean, *arrInserts;
     int count=0;
     unsigned short sumInsertsize=0;
+	float *info;
     std::string filename = argv[1], chr = argv[2];
     BamTools::BamReader reader;
 
@@ -51,14 +61,14 @@ int main(int argc, char *argv[])
 
     BamTools::BamAlignment al;
     //do the job
-    arrInserts = calloc(1, sizeof(int32_t));
+    arrInserts = (int32_t *)calloc(1, sizeof(int32_t));
     while ( reader.GetNextAlignment(al) ){
 		if (al.IsProperPair()){
 			arrInserts[count]=abs(al.InsertSize);
             count++;
-            arrInserts = (int32_t *)realloc(arrInserts, count*sizeof(int32_t));
+            arrInserts = (int32_t *)realloc(arrInserts, (count+1)*sizeof(int32_t));
         }
 	}
-	std::cout << "Mean;
+	info = stdev(arrInserts, count);
+	cout << "Mean: " << info[0] << "\t" << "Std: " << info[1];
 }
-
