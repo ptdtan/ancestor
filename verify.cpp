@@ -11,7 +11,7 @@ using namespace BamTools;
 int main(int argc, char *argv[])
 {
     //unsigned short count;
-    int32_t uRstart, uRend, uWall;
+    int32_t uRstart, uRend, uLen, uWall;
     int count=0;
     unsigned short sumInsertsize=0;
     bool flag = false;
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         return -1;
         }
     int RefID = reader.GetReferenceID(chr);
-    BamTools::BamRegion region(RefID, uRstart, RefID, uRend);
+    BamTools::BamRegion region(RefID, uRstart, RefID, uWall);
 
     reader.SetRegion(region);
 
@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
             //count++;
 			cout << "True" << endl;
 			flag = true;
+			break;
         }
 	}
 	if (!flag)

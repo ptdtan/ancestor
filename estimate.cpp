@@ -26,7 +26,7 @@ float *stdev(int32_t *arrInserts, int len){
     mean = sum/len;
 	ret[0] =mean;
     for(i=0; i<len; i++)
-        sumstd+=(arrInserts[i]-mean)*(arrInserts[i]-mean);
+        sumstd+=(float)(arrInserts[i]-mean)*(float)(arrInserts[i]-mean);
 	ret[1] = sqrt(sumstd/len);
     return ret;
 }
@@ -64,11 +64,11 @@ int main(int argc, char *argv[])
     arrInserts = (int32_t *)calloc(1, sizeof(int32_t));
     while ( reader.GetNextAlignment(al) ){
 		if (al.IsProperPair()){
-			arrInserts[count]=abs(al.InsertSize);
+			arrInserts[count]=(int32_t)abs(al.InsertSize);
             count++;
             arrInserts = (int32_t *)realloc(arrInserts, (count+1)*sizeof(int32_t));
         }
 	}
 	info = stdev(arrInserts, count);
-	cout << "Mean: " << info[0] << "\t" << "Std: " << info[1];
+	cout << "Mean: " << info[0] << "\t" << "Std: " << info[1] << "\t" << count << endl;
 }
