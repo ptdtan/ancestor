@@ -11,17 +11,18 @@ using namespace BamTools;
 int main(int argc, char *argv[])
 {
     //unsigned short count;
-    int32_t uRstart, uLen, uRend, uGap, uMean;
+    int32_t uRstart, uRend, uWall;
     int count=0;
     unsigned short sumInsertsize=0;
-    std::string filename = argv[1], chr = argv[2];
+    bool flag = false;
+	std::string filename = argv[1], chr = argv[2];
     BamTools::BamReader reader;
 
     std::stringstream(argv[3]) >> uRstart;
-    std::stringstream(argv[4]) >> uLen;
-    std::stringstream(argv[5]) >> uGap;
-    std::stringstream(argv[6]) >> uMean;
-    uRend = uRstart + uLen;
+    std::stringstream(argv[4]) >> uWall;
+    std::stringstream(argv[5]) >> uLen;
+    //std::stringstream(argv[6]) >> uMean;
+    uRend = uWall + uLen;
 
     //open BAM and its index
     if (!reader.Open(filename)){
@@ -41,12 +42,16 @@ int main(int argc, char *argv[])
     BamTools::BamAlignment al;
     //do the job
     while ( reader.GetNextAlignment(al) ){
-		if (al.MatePosition > uRend){
+		if (al.MatePosition > uWall && al.MatePosition < uRend){
             //cout  << (unsigned long)al.Position << "\t" <<(unsigned long)al.MatePosition << endl;
-			sumInsertsize+=abs(al.InsertSize)-uGap;
-            count++;
+			//sumInsertsize+=abs(al.InsertSize)-uGap;
+            //count++;
+			cout << "True" << endl;
+			flag = true;
         }
 	}
-	std::cout << std::fixed << sumInsertsize/count;
+	if (!flag)
+		cout << "False" << endl;
+		//std::cout << std::fixed << sumInsertsize/count;
 }
 
