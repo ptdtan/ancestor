@@ -6,29 +6,7 @@ import networkx as nx
 import subprocess
 import commands
 from copy import copy
-
 import logging
-
-def LogInstance(log_file):
-    """
-    Turns on logging, sets debug levels and assigns a log file
-    """
-    logger = logging.getLogger()
-    log_formatter = logging.Formatter("[%(asctime)s] %(name)s: %(levelname)s: "
-                                      "%(message)s", "%H:%M:%S")
-    console_formatter = logging.Formatter("[%(asctime)s] %(levelname)s: "
-                                          "%(message)s", "%H:%M:%S")
-    console_log = logging.StreamHandler()
-    console_log.setFormatter(console_formatter)
-    console_log.setLevel(logging.INFO)
-
-    file_handler = logging.FileHandler(log_file, mode="w")
-    file_handler.setFormatter(log_formatter)
-
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(console_log)
-    logger.addHandler(file_handler)
-    return logger
 
 def exeCommand(sCommand):
     ###Get all output data
@@ -38,29 +16,26 @@ def exeCommand(sCommand):
     out, errData = process.communicate()
 
     ###Get all response data
-    """for lineData in outData.splitlines():
-        #if(self.RUNNING_DEBUG_FLAG == 1):
-        outStringData = str(lineData)
-        print("%s" % (outStringData))"""
-    #print "outdata: "+outData
     ###If there is error
     if ((errData != None) and (len(errData) > 0)):
-        print("Command has error:{0}".format(errData))
-	print out
-	return out.splitlines()
+        sys.stderr.write("Command has error:{0}".format(errData))
+	if out:
+        sys.stdout.write(out)
+    pass
 
 def run_command(chr, wall, pre, next, bam, info = None):
 	start, end = wall-500, wall+500
-	command = ' '.join(['sambamba', 'view', '-t', '32', '-F',  'proper_pair',  bam,  "".join([chr, ':', 
+	command = ' '.join(['sambamba', 'view', '-t', '32', '-F',  'proper_pair',  bam,  "".join([chr, ':',
 						str(start),'-', str(end)]), '|', './check_span.py', str(wall), pre, next, chr, " "]) + " ".join(info)
 	#print command
-	os.system(command)
+	exeCommand(command)
 
 def _pair_iter(adjacencies):
 	for pre, next in zip(adjacencies[:-1], adjacencies[1:]):
 		yield pre, next
 
 def read_links(ifile):
+    "Parser for scaffolds_links file"
 	ofile = open(ifile)
 	scaffolds_links = ofile.read().strip().split('\n\n')
 	chr_scaffolds = []
@@ -76,7 +51,7 @@ def generate_path(chr_scaffolds):
 		chr_paths[chr_name] = [scf.strip().split() for scf in chr[1:]]
 	return chr_paths
 
-def main(file, bam):
+def verify_read_span(file, bam):
 	chr_scaffolds = read_links(file)
 	for chr in chr_scaffolds:
 		chr_name = chr[0]
@@ -87,17 +62,17 @@ def main(file, bam):
 				if int(prescf[3]) > 50:
 					continue
 				wall = int(nextscf[1])
-				run_command(chr_name, wall, prescf[0], nextscf[0], bam, 
+				run_command(chr_name, wall, prescf[0], nextscf[0], bam,
 								info=[prescf[1], prescf[2], nextscf[2], prescf[3]])
 			except KeyboardInterrupt:
 				sys.exit(0)
 
-if __name__ == "__main__":
+def reduceN50(LINK_STREAM, N50_STREAM, BAM_FILE)
 	chr_scaffolds = read_links(sys.argv[1])
-	ologger = LogInstance(sys.argv[1]+".log")
-	fout = open(sys.argv[1]+".red", "w")
-	fN50 = open(sys.argv[1]+".n50", "w")
-	bam = sys.argv[2]
+	ologger = LogInstance(LINK_STREAM+".log")
+	fout = open(LINK_STREAM+".red", "w")
+	fN50 = open(N50_STREAM+".n50", "w")
+	bam = BAM_FILE
 	chr_paths = generate_path(chr_scaffolds)
 	chr_new_paths = dict()
 	for chr, scfs in chr_paths.items():
@@ -105,6 +80,7 @@ if __name__ == "__main__":
 		new_paths = []
 		temp_path = [scfs[0]]
 		for pre, next in _pair_iter(scfs):
+            ###Add bamtools 2.4.0 to LD_LIBRARY_PATH first
 			status, ret = commands.getstatusoutput("./verify %s %s %s %s %s" %(bam, chr, pre[1], next[1], next[2]))
 			if ret == "True":
 				temp_path.append(next)
