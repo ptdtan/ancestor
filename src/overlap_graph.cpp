@@ -9,20 +9,28 @@ using namespace std;
 using namespace BamTools;
 
 struct node{
-  char *self;
-  int in, out;
-  double win, wout;
+	int inIdx;
+	int outIdx;
+  //double win, wout;
 };
+
+void initialize(std::vector<node> *nodes){
+	for(std::vector<node>::iterator it=nodes->begin(); it!=nodes->end(); it++){
+		it->inIdx = -1;
+		it->outIdx = -1;
+	}
+}
 
 int main(int argc, char *argv[])
 {
     //unsigned short count;
-    int32_t uStart, uEnd;
-    int count=0;
-    vector<node> nodes;
-    //const BamTools::RefVector *references;
+    int count=0, RefID;
+	int32_t currPos, currMatePos;
+	int thresHold;
+    //std::vector<node> nodes;
 	const BamTools::RefVector *references;
     string filename = argv[1];
+	std::stringstream(argv[2]) >> thresHold;
     BamTools::BamReader reader;
 
     //open BAM and its index
@@ -36,11 +44,51 @@ int main(int argc, char *argv[])
         return -1;
         }
     references = &reader.GetReferenceData();
-
-    cout << (*references).size() << endl;
+	std::vector<int> counter(references->size(), 0);
+	std::vector<node> nodes(references->size());
+	//initialize
+	initialize(&nodes);
+	//for(int i=0; i<counter.size(); i++)
+	//	cout << counter[i] << endl;
+	//for(int i=0; i<nodes.size(); i++)
+	//	cout << nodes[i].inIdx << endl;
+    //cout << (*references).size() << endl;
     //Get all reference sequence name
-	for(std::vector<BamTools::RefData>::const_iterator it=references->begin(); it!=references->end(); it++)
-		      cout << it->RefName << endl;
+	for(std::vector<BamTools::RefData>::const_iterator it=references->begin(); it!=references->end(); it++){
+		count = 0;
+		cout << "Infering: " << it->RefName << endl;
+		RefID = reader.GetReferenceID(it->RefName);
+		//cout << RefID << endl;
+		BamTools::BamRegion region(RefID,0,RefID,it->RefLength);
+		reader.SetRegion(region);
+		BamTools::BamAlignment al;
+
+		//go right
+		while (reader.GetNextAlignment(al)){
+			cout << al.RefID << endl;
+			currPos = al.Position;
+			if (count > thresHold){
+				cout << (*references)[al.RefID].RefName << endl;
+				cout << count << endl;
+				break;
+			}
+			if (al.AlignmentFlag == 97 && al.MateRefID != RefID){
+				currMatePos = al.MatePosition;
+				//cout << al.MateRefID << endl;
+				reader.Jump(al.MateRefID, al.MatePosition);
+				while (reader.GetNextAlignment(al)){
+					if (al.Position == currMatePos && al.AlignmentFlag == 145){
+					//cout <<al.Position << endl;
+					cout << (*references)[al.RefID].RefName << endl;
+					//reader.Jump(RefID, currPos);
+					reader.Jump(RefID, currPos);
+					count++;
+					break;
+					}
+				}
+			}
+		}
+	}
     /*int RefID = reader.GetReferenceID(chr);
     BamTools::BamRegion region(RefID, uRstart, RefID, uWall);
 
