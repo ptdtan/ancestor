@@ -9,9 +9,9 @@ using namespace std;
 using namespace BamTools;
 
 struct node{
-  char *in;
-  char *out;
-  int weight;
+  char *self;
+  int in, out;
+  double win, wout;
 }
 
 int main(int argc, char *argv[])
@@ -19,8 +19,10 @@ int main(int argc, char *argv[])
     //unsigned short count;
     int32_t uStart, uEnd
     int count=0;
-    std::string filename = argv[1]
-    BamTools::BamReader reader;
+    vector<node> nodes;
+    RefVector references;
+    string filename = argv[1]
+    BamReader reader;
 
     //open BAM and its index
     if (!reader.Open(filename)){
@@ -32,8 +34,13 @@ int main(int argc, char *argv[])
             cerr << "Could not open or create index file!" << endl;
         return -1;
         }
+    references = reader.GetReferenceData()
+    for(RefVector::iterator it=references.begin(); it!=references.end(); it++){
+      cout << references[i] << endl;
+    }
     //Get all reference sequence name
-    int RefID = reader.GetReferenceID(chr);
+
+    /*int RefID = reader.GetReferenceID(chr);
     BamTools::BamRegion region(RefID, uRstart, RefID, uWall);
 
     reader.SetRegion(region);
@@ -52,5 +59,5 @@ int main(int argc, char *argv[])
 	}
 	if (!flag)
 		cout << "False" << endl;
-		//std::cout << std::fixed << sumInsertsize/count;
+		//std::cout << std::fixed << sumInsertsize/count;*/
 }
