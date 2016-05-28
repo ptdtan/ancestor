@@ -12,17 +12,18 @@ struct node{
   char *self;
   int in, out;
   double win, wout;
-}
+};
 
 int main(int argc, char *argv[])
 {
     //unsigned short count;
-    int32_t uStart, uEnd
+    int32_t uStart, uEnd;
     int count=0;
     vector<node> nodes;
-    RefVector references;
-    string filename = argv[1]
-    BamReader reader;
+    //const BamTools::RefVector *references;
+	const BamTools::RefVector *references;
+    string filename = argv[1];
+    BamTools::BamReader reader;
 
     //open BAM and its index
     if (!reader.Open(filename)){
@@ -34,12 +35,12 @@ int main(int argc, char *argv[])
             cerr << "Could not open or create index file!" << endl;
         return -1;
         }
-    references = reader.GetReferenceData()
-    for(RefVector::iterator it=references.begin(); it!=references.end(); it++){
-      cout << references[i] << endl;
-    }
-    //Get all reference sequence name
+    references = &reader.GetReferenceData();
 
+    cout << (*references).size() << endl;
+    //Get all reference sequence name
+	for(std::vector<BamTools::RefData>::const_iterator it=references->begin(); it!=references->end(); it++)
+		      cout << it->RefName << endl;
     /*int RefID = reader.GetReferenceID(chr);
     BamTools::BamRegion region(RefID, uRstart, RefID, uWall);
 
