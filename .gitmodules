@@ -1,3 +1,6 @@
 [submodule "bamtools"]
 	path = bamtools
 	url = https://github.com/ptdtan/bamtools.git
+[submodule "Ragout"]
+	path = Ragout
+	url = https://github.com/ptdtan/Ragout.git
