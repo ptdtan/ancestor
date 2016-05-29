@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 			currPos = al.Position;
 			//cout << currPos << endl;
 			//go right
-			if (al.AlignmentFlag == 97 && al.MateRefID != RefID &&al.MapQuality > 50 && nodes[RefID].outIdx == -1){
+			if (al.AlignmentFlag == 97 && al.MateRefID != RefID &&al.MapQuality > 20 && nodes[RefID].outIdx == -1){
 				currMatePos = al.MatePosition;
 				//cout << al.MateRefID << endl;
 				reader.Jump(al.MateRefID, al.MatePosition);
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 				}
 			}
 			//go left
-			if (al.AlignmentFlag == 145 && al.MateRefID != RefID &&al.MapQuality > 50 && nodes[RefID].inIdx == -1){
+			if (al.AlignmentFlag == 145 && al.MateRefID != RefID &&al.MapQuality > 20 && nodes[RefID].inIdx == -1){
 				currMatePos = al.MatePosition;
 				reader.Jump(al.MateRefID, al.MatePosition-al.Length-50);
 				while (reader.GetNextAlignment(al)){
