@@ -1,14 +1,4 @@
-#ancestor
+# Acestor
+Reconstruct the ancestor genome base on Ragout pipeline and HAL alignment
 
-***Install:
-git clone --recursive https://github.com/ptdtan/ancestor.git
-cd ancestor/bamtools
-mkdir build && cd build && cmake .. && make
-cd src && make
-export LD_LIBRARY_PATH=$LD_LIBARY_PATH:/path/to/ancestor/bamtools/lib
-
-***Usage:
-./overlap_graph <bamFile> <ThresHold>
-
-
-
+  - Using the parsimony algorithm of Ragout to reconstruct the ancestor genome
