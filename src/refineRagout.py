@@ -40,22 +40,26 @@ class Scaffold:
         self.contigs[-2].link = est_gap
         return
 
-    def _break(self, cntName, slide=1):
+    def _break(self, cntName, slide=1, trimmed=False):
         """
         break to the rights: slide +1
         break to the left: slide 0
         """
         try:
             cnt_idx = self.hash_cnts[cntName]
-            cnts1 = self.contigs[:cnt_idx+slide]
+            if trimmed:
+                cnts1 = self.contigs[:cnt_idx]
+                cnts2 = self.contigs[cnt_idx+slide:]
+            else:
+                cnts1 = self.contigs[:cnt_idx+slide]
+                cnts2 = self.contigs[cnt_idx+slide:]
             cnts1[-1].link = 0
-            cnts2 = self.contigs[cnt_idx+slide:]
             name1 = "%s.broken.%s.1" %(self.name, cntName)
             name2 = "%s.broken.%s.2" %(self.name, cntName)
             return Scaffold(name1, cnts1), Scaffold(name2, cnts2)
         except KeyError:
             print "Can't break, contig not found"
-        pass
+        return
 
     def _add_seq(self, seqDict):
         for i in range(len(self.contigs)):
@@ -81,8 +85,20 @@ class Assembly:
     def with_links(name, links):
         return Assembly(name, scaffolds = parse_links(links))
 
-    @staticmethod
-    def _merge(cnt1, cnt2):
+    def _merge(self, cnt1name, cnt2name):
+        scf1idx = self.scf_hash[self.cnts_hash[cnt1name]]
+        scf2idx = self.scf_hash[self.cnts_hash[cnt2name]]
+        scf1, scf2 = self.scaffolds[scf1idx], self.scaffolds[scf2idx]
+        try:
+            cnt1, cnt2 = scf1.contigs[scf1.hash_cnts[cnt1name]] , scf2.contigs[scf2.hash_cnts[cnt2name]]
+        except KeyError:
+            print "Can't merge"
+            return
+        pair1, pair2 = scf1._break(cnt1name), scf2._break(cnt2name, trimmed=True)
+        if (pair1 and pair2) and (cnt1.sign==1 and cnt2.sign==1):
+            pair1[0]._join(cnt2)
+        self._update(old=[scf1, scf2], new=pair1+pair2)
+        pass
 
     def _update(self, old=[], new=[]):
         map(lambda x: self.scaffolds.pop(x), [self.scf_hash[scf.name] for scf in old])
