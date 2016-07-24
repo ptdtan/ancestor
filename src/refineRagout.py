@@ -36,7 +36,7 @@ class Scaffold:
     def __hash__(self):
         return hash(self.name)
 
-    def _join(self, cnt, est_gap):
+    def _join(self, cnt, est_gap=MIN_GAP_SIZE):
         self.contigs.append(copy(cnt))
         self.contigs[-2].link = est_gap
         return
