@@ -97,7 +97,7 @@ class Assembly:
         scf_lens = list()
         for scf in self.scaffolds:
             scf_len = sum([len(cnt.seq)+cnt.link for cnt in scf.contigs])
-            scf_lens.append(scf_lens)
+            scf_lens.append(scf_len)
         n50 = ul._calc_n50(scf_lens, sum(scf_lens))
         print "N50: %d" %(n50)
         pass
