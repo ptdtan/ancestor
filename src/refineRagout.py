@@ -31,7 +31,7 @@ class Scaffold:
         self.contigs = contigs
         self.name = name
         self.hash_cnts = {cnt.uname:self.contigs.index(cnt) for cnt in contigs}
-        self.sequence = ''
+        self.seq = ''
 
     def __hash__(self):
         return hash(self.name)
@@ -78,10 +78,10 @@ class Scaffold:
         sequence = []
         for cnt in self.contigs:
             if cnt.sign == 1:
-                sequence.append(''.join(cnt.seq,'N'*cnt.link))
+                sequence.append(''.join([cnt.seq,'N'*cnt.link]))
             else:
-                sequence.append(''.join(ul.reverse_complement(cnt.seq), 'N'*cnt.link)
-        self.sequence = ''.join(sequence)
+                sequence.append(''.join([ul.reverse_complement(cnt.seq), 'N'*cnt.link]))
+        self.seq = ''.join(sequence)
         pass
 class Assembly:
     def __init__(self, name, scaffolds = []):
