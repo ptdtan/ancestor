@@ -31,48 +31,49 @@ int main(int argc, char *argv[])
     int RefID = reader.GetReferenceID(chr);
     references = &reader.GetReferenceData();
     chrLength = (*references)[RefID].RefLength;
-    BamTools::BamRegion region(RefID, 1, RefID, chrLength);
 
-    reader.SetRegion(region);
     references = &reader.GetReferenceData();
     BamTools::BamAlignment al;
     //do the job
+    BamTools::BamRegion region(RefID, chrLength-1000000, RefID, chrLength);
+    reader.SetRegion(region);
     while (reader.GetNextAlignment(al)){
       //cout << al.Length << endl;
-      if (inIdx != -1 && outIdx != -1) break;
+      if (outIdx != -1) break;
       currPos = al.Position;
-
       //go right
-      if (al.AlignmentFlag == 97 && al.MateRefID != RefID &&al.MapQuality > 20 && outIdx== -1){
+      if (al.AlignmentFlag == 97 && al.MateRefID != RefID &&al.MapQuality > 20){
         currMatePos = al.MatePosition;
         reader.Jump(al.MateRefID, al.MatePosition);
         while (reader.GetNextAlignment(al)){
-          if (al.Position == currMatePos && al.AlignmentFlag == 145){
+          if (al.Position == currMatePos && al.AlignmentFlag == 145)
             outCounter++;
-            if (outCounter > thresHold) {
+          if (outCounter > thresHold)
               outIdx = al.RefID;
-            }
-            reader.SetRegion(RefID, currPos, RefID, chrLength);
-            break;
+          reader.SetRegion(RefID, currPos, RefID, chrLength);
+          break;
           }
         }
       }
+    region = BamTools::BamRegion(RefID, 1, RefID, 1000000);
+    reader.SetRegion(region);
+    while (reader.GetNextAlignment(al)){
       //go left
-      if (al.AlignmentFlag == 145 && al.MateRefID != RefID &&al.MapQuality > 20 && inIdx == -1){
+      if (inIdx != -1) break;
+      currPos = al.Position;
+      if (al.AlignmentFlag == 145 && al.MateRefID != RefID &&al.MapQuality > 20){
         currMatePos = al.MatePosition;
         reader.Jump(al.MateRefID, al.MatePosition-al.Length-50);
         while (reader.GetNextAlignment(al)){
-          if (al.Position == currMatePos && al.AlignmentFlag == 97){
+          if (al.Position == currMatePos && al.AlignmentFlag == 97)
             inCounter++;
-            if (inCounter> thresHold){
+            if (inCounter> thresHold)
               inIdx = al.RefID;
-            }
             reader.SetRegion(RefID, currPos, RefID, chrLength);
             break;
           }
         }
       }
-    }
 	if (inIdx != -1)
 		std::cout <<  (*references)[inIdx].RefName << "\t" << chr << "\t" << inCounter << endl;
 	if (outIdx != -1)
