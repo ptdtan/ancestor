@@ -3,6 +3,8 @@ MIN_GAP_SIZE = 11
 import ultilities as ul
 from collections import defaultdict
 from Bio import SeqIO
+from copy import copy
+
 class Contig:
     def __init__(self, uname=None, seq=None, start = 0, end = 0 ,
                  link=MIN_GAP_SIZE, sign="+", region=(0,0)):
@@ -34,28 +36,36 @@ class Scaffold:
         return hash(self.name)
 
     def _join(self, cnt, est_gap):
-        self.contigs.append(cnt)
+        self.contigs.append(copy(cnt))
         self.contigs[-2].link = est_gap
         return
 
-    def _break(self, cnt, slide=1):
+    def _break(self, cntName, slide=1):
         """
         break to the rights
         """
-        cnt_idx = self.hash_cnts[cnt]
-        cnts1 = self.contigs[:cnt_idx+slide]
-        cnts2 = self.contigs[cnt_idx+slide:]
-        name1 = "%s.broken.%s.1" %(self.name, cnt.name)
-        name2 = "%s.broken.%s.2" %(self.name, cnt.name)
-        return Scaffold(name1, cnts1), Scaffold(name2, cnts2)
+        try:
+            cnt_idx = self.hash_cnts[cntName]
+            cnts1 = self.contigs[:cnt_idx+slide]
+            cnts2 = self.contigs[cnt_idx+slide:]
+            name1 = "%s.broken.%s.1" %(self.name, cnt.name)
+            name2 = "%s.broken.%s.2" %(self.name, cnt.name)
+            return Scaffold(name1, cnts1), Scaffold(name2, cnts2)
+        except KeyError:
+            print "Can't break, contig not found"
+        pass
 
     def _add_seq(self, seqDict):
         for i in range(len(self.contigs)):
             start, end = self.contigs[i].region
             if start + end == 0:
                 self.contigs[i].seq = seqDict[self.contigs[i].name][:]
+                self.contigs[i].start = 0
+                self.contigs[i].end = len(self.contigs[i].seq)
             else:
                 self.contigs[i].seq = seqDict[self.contigs[i].name][start:end]
+                self.contigs[i].start = start
+                self.contigs[i].end = end
 
 class Assembly:
     def __init__(self, name, scaffolds = []):
