@@ -78,12 +78,18 @@ class Assembly:
         self.scaffolds = scaffolds
         self.name = name
         self.scf_hash = {scf.name:self.scaffolds.index(scf) for scf in self.scaffolds}
-        self.cnts_hash = {cnt.uname:scf.name for cnt in scf.contigs for scf in self.scaffolds}
-
+        self.cnts_hash = self._hash_cnts()
         self.seqs = dict()
     @staticmethod
     def with_links(name, links):
         return Assembly(name, scaffolds = parse_links(links))
+
+    def _hash_cnts(self):
+        ret = dict()
+        for scf in self.scaffolds:
+            for cnt in scf.contigs:
+                ret[cnt.uname] = scf.name
+        return ret
 
     def _merge(self, cnt1name, cnt2name):
         scf1idx = self.scf_hash[self.cnts_hash[cnt1name]]
