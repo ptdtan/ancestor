@@ -9,12 +9,15 @@ This module provides some basic FASTA I/O
 import logging
 
 from string import maketrans
+from Bio import SeqIO
 
 logger = logging.getLogger()
 
 class FastaError(Exception):
     pass
 
+def fasta_parser(filename):
+    return SeqIO.parse(filename, format="fasta")
 def read_fasta_dict(filename):
     """
     Reads fasta file into dictionary. Also preforms some validation
