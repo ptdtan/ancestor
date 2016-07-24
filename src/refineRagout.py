@@ -61,7 +61,7 @@ class Assembly:
         self.scaffolds = scaffolds
         self.name = name
         self.scf_hash = {scf:self.scaffolds.index(scf) for scf in scaffolds}
-        self.seqs = None
+        self.seqs = dict()
     @staticmethod
     def with_links(name, links):
         return Assembly(name, scaffolds = parse_links(links))
@@ -73,7 +73,8 @@ class Assembly:
         return
 
     def _getSeq(self, fileSeq):
-        self.seqs = SeqIO.parse(fileSeq, format="fasta")
+        for seq in SeqIO.parse(fileSeq, format="fasta"):
+            self.seqs[seq.id] = seq.seq
         pass
 
 def parse_links(links):
