@@ -2,7 +2,7 @@ MIN_GAP_SIZE = 11
 #from ultilities import *
 import ultilities as ul
 from collections import defaultdict
-
+from Bio import SeqIO
 class Contig:
     def __init__(self, name=None, seq=None, start = 0, end = 0 ,
                  link=MIN_GAP_SIZE, sign="+", region=(0,0)):
@@ -73,7 +73,7 @@ class Assembly:
         return
 
     def _getSeq(self, fileSeq):
-        self.seqs = ul.fasta_parser(fileSeq)
+        self.seqs = SeqIO.parse(fileSeq, format="fasta")
         pass
 
 def parse_links(links):
