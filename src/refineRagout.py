@@ -71,7 +71,7 @@ class Assembly:
     def __init__(self, name, scaffolds = []):
         self.scaffolds = scaffolds
         self.name = name
-        self.scf_hash = {scf:self.scaffolds.index(scf) for scf in scaffolds}
+        self.scf_hash = {scf.name:self.scaffolds.index(scf) for scf in scaffolds}
         self.seqs = dict()
     @staticmethod
     def with_links(name, links):
@@ -125,5 +125,5 @@ def parse_links(links):
             else:
                 contigs.append(Contig(uname=name[1:], start = int(start), end = int(end),
                               link = int(gap), sign=name[0]))
-    assembly.append(Scaffold(name = arr[0], contigs = contigs))
+        assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
