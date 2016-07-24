@@ -16,42 +16,6 @@ logger = logging.getLogger()
 class FastaError(Exception):
     pass
 
-def fasta_parser(filename):
-    return SeqIO.parse(filename, format="fasta")
-def read_fasta_dict(filename):
-    """
-    Reads fasta file into dictionary. Also preforms some validation
-    """
-    logger.info("Reading contigs file")
-
-    header = None
-    seq = []
-    fasta_dict = {}
-
-    try:
-        with open(filename, "r") as f:
-            for lineno, line in enumerate(f):
-                line = line.strip()
-                if line.startswith(">"):
-                    if header:
-                        fasta_dict[header] = "".join(seq)
-                        seq = []
-                    header = line[1:].split(" ")[0]
-                else:
-                    if not _validate_seq(line):
-                        raise FastaError("Invalid char in \"{0}\" at line {1}"
-                                         .format(filename, lineno))
-                    seq.append(line)
-
-            if header and len(seq):
-                fasta_dict[header] = "".join(seq)
-
-    except IOError as e:
-        raise FastaError(e)
-
-    return fasta_dict
-
-
 def write_fasta_dict(fasta_dict, filename):
     """
     Writes dictionary with fasta to file
@@ -69,9 +33,18 @@ COMPL = maketrans("ATGCURYKMSWBVDHNXatgcurykmswbvdhnx",
 def reverse_complement(string):
     return string[::-1].translate(COMPL)
 
-
 def _validate_seq(sequence):
     VALID_CHARS = "ACGTURYKMSWBDHVNXatgcurykmswbvdhnx"
     if len(sequence.translate(None, VALID_CHARS)):
         return False
     return True
+
+def _calc_n50(scaffolds_lengths, assembly_len):
+    n50 = 0
+    sum_len = 0
+    for l in sorted(scaffolds_lengths, reverse=True):
+        sum_len += l
+        if sum_len > assembly_len / 2:
+            n50 = l
+            break
+    return n50

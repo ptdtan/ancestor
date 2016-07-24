@@ -92,6 +92,15 @@ class Assembly:
         for scf in self.scaffolds:
             scf._add_seq(self.seqs)
         pass
+
+    def _validate(self):
+        scf_lens = list()
+        for scf in self.scaffolds:
+            scf_len = sum([len(cnt.seq)+cnt.link for cnt in scf.contigs])
+            scf_lens.append(scf_lens)
+        n50 = ul._calc_n50(scf_lens, sum(scf_lens))
+        print "N50: %d" %(n50)
+        pass
 def parse_links(links):
     """Parser for scaffolds_links file
     @param ifile: _scaffolds.links file
