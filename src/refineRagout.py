@@ -100,7 +100,7 @@ def parse_links(links):
             if "[" in name:
                 raw_region = name[name.index("[")+1:name.index("]")]
                 region = tuple(map(int, raw_region.split(":")))
-                contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
+                contigs.append(Contig(name=name[1:name.index("[")], start = int(start), end = int(end),
                                   link = int(gap), sign=name[0], region=region))
             else:
                 contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
