@@ -92,6 +92,9 @@ def parse_links(links):
                 name, start, end , gap, _ = cnt_raw.strip().split("\t")
             except ValueError:
                 name, start, end , gap = cnt_raw.strip().split("\t")
+            if "[" in name:
+                raw_region = name[name.index("[")+1:name.index("]")]
+                region = tuple(map(int, raw_region.split(":")))
             contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
                                   link = int(gap), sign=name[0]))
     assembly.append(Scaffold(name = arr[0], contigs = contigs))
