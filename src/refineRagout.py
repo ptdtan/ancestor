@@ -1,6 +1,6 @@
 MIN_GAP_SIZE = 11
 #from ultilities import *
-from ultilities import *
+import ultilities as ul
 from collections import defaultdict
 
 class Contig:
@@ -73,7 +73,7 @@ class Assembly:
         return
 
     def _getSeq(self, fileSeq):
-        self.seqs = fasta_parser(fileSeq)
+        self.seqs = ul.fasta_parser(fileSeq)
         pass
 
 def parse_links(links):
