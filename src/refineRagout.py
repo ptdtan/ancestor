@@ -42,14 +42,15 @@ class Scaffold:
 
     def _break(self, cntName, slide=1):
         """
-        break to the rights
+        break to the rights: slide +1
+        break to the left: slide -1
         """
         try:
             cnt_idx = self.hash_cnts[cntName]
             cnts1 = self.contigs[:cnt_idx+slide]
             cnts2 = self.contigs[cnt_idx+slide:]
-            name1 = "%s.broken.%s.1" %(self.name, cnt.name)
-            name2 = "%s.broken.%s.2" %(self.name, cnt.name)
+            name1 = "%s.broken.%s.1" %(self.name, cntName)
+            name2 = "%s.broken.%s.2" %(self.name, cntName)
             return Scaffold(name1, cnts1), Scaffold(name2, cnts2)
         except KeyError:
             print "Can't break, contig not found"
