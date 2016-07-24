@@ -76,7 +76,7 @@ class Assembly:
         for seq in SeqIO.parse(fileSeq, format="fasta"):
             self.seqs[seq.id] = seq.seq
         pass
-        
+
     def _addSeq(self):
         for scf in self.scaffolds:
             scf._add_seq(self.seqs)
@@ -100,7 +100,10 @@ def parse_links(links):
             if "[" in name:
                 raw_region = name[name.index("[")+1:name.index("]")]
                 region = tuple(map(int, raw_region.split(":")))
-            contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
-                                  link = int(gap), sign=name[0]))
+                contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
+                                  link = int(gap), sign=name[0], region=region))
+            else:
+                contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
+                              link = int(gap), sign=name[0]))
     assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
