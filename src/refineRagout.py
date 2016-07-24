@@ -4,9 +4,13 @@ import ultilities as ul
 from collections import defaultdict
 from Bio import SeqIO
 class Contig:
-    def __init__(self, name=None, seq=None, start = 0, end = 0 ,
+    def __init__(self, uname=None, seq=None, start = 0, end = 0 ,
                  link=MIN_GAP_SIZE, sign="+", region=(0,0)):
-        self.name = name
+        self.uname = uname
+        if "[" in uname:
+            self.name = uname[:uname.index("[")]
+        else:
+            self.name = uname
         self.seq = seq
         self.link = link
         self.start = start
@@ -20,14 +24,11 @@ class Contig:
         else:
             self.sign = -1
 
-    def __hash__(self):
-        return hash(self.name)
-
 class Scaffold:
     def __init__(self, name, contigs):
         self.contigs = contigs
         self.name = name
-        self.hash_cnts = {cnt:self.contigs.index(cnt) for cnt in contigs}
+        self.hash_cnts = {cnt.uname:self.contigs.index(cnt) for cnt in contigs}
 
     def __hash__(self):
         return hash(self.name)
@@ -100,10 +101,10 @@ def parse_links(links):
             if "[" in name:
                 raw_region = name[name.index("[")+1:name.index("]")]
                 region = tuple(map(int, raw_region.split(":")))
-                contigs.append(Contig(name=name[1:name.index("[")], start = int(start), end = int(end),
+                contigs.append(Contig(uname=name[1:],  start = int(start), end = int(end),
                                   link = int(gap), sign=name[0], region=region))
             else:
-                contigs.append(Contig(name=name[1:], start = int(start), end = int(end),
+                contigs.append(Contig(uname=name[1:], start = int(start), end = int(end),
                               link = int(gap), sign=name[0]))
     assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
