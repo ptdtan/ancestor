@@ -76,7 +76,11 @@ class Assembly:
         for seq in SeqIO.parse(fileSeq, format="fasta"):
             self.seqs[seq.id] = seq.seq
         pass
-
+        
+    def _addSeq(self):
+        for scf in self.scaffolds:
+            scf._add_seq(self.seqs)
+        pass
 def parse_links(links):
     """Parser for scaffolds_links file
     @param ifile: _scaffolds.links file
