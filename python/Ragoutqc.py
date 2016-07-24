@@ -35,35 +35,37 @@ def _pair_iter(adjacencies):
 		yield pre, next
 
 def read_links(ifile):
-    "Parser for scaffolds_links file"
-	ofile = open(ifile)
+    """Parser for scaffolds_links file
+    @param ifile: _scaffolds.links file
+    @return"""
+    ofile = open(ifile)
 	scaffolds_links = ofile.read().strip().split('\n\n')
-	chr_scaffolds = []
+	chr_scaffolds = {}
 	for block in scaffolds_links:
 		arr = block.split('\n')
-		chr_scaffolds.append([arr[0]]+arr[1:])
+		chr_scaffolds[arr[0]] = arr[1:]
 	return chr_scaffolds
 
 def generate_path(chr_scaffolds):
 	chr_paths = {}
-	for chr in chr_scaffolds:
-		chr_name = chr[0]
-		chr_paths[chr_name] = [scf.strip().split() for scf in chr[1:]]
+	for chr, contigs in chr_scaffolds.items():
+		chr_name = chr
+		chr_paths[chr_name] = [scf.strip().split() for scf in contigs ]
 	return chr_paths
 
 def verify_read_span(file, bam):
 	chr_scaffolds = read_links(file)
-	for chr in chr_scaffolds:
-		chr_name = chr[0]
-		for pre, next in _pair_iter(chr[1:]):
+	for chr, contigs in chr_scaffolds.items():
+		chr_name = chr
+		for pre, next in _pair_iter(contigs):
 			try:
-				prescf = pre.strip().split()
-				nextscf = next.strip().split()
-				if int(prescf[3]) > 50:
+				preName, preStart, preLen, preGaps,__ = pre.strip().split()
+				nextName, nextStart, nextLen, nextGaps,__ = next.strip().split()
+				if int(preGaps) > 50:
 					continue
-				wall = int(nextscf[1])
-				run_command(chr_name, wall, prescf[0], nextscf[0], bam,
-								info=[prescf[1], prescf[2], nextscf[2], prescf[3]])
+				wall = int(nextStart)
+				run_command(chr_name, wall, preName, nextName, bam,
+								info=[preStart, preLen, nextLen, preGaps)
 			except KeyboardInterrupt:
 				sys.exit(0)
 
