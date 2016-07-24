@@ -91,6 +91,14 @@ class Assembly:
                 ret[cnt.uname] = scf.name
         return ret
 
+    def _split(self, cntname):
+        scfidx = self.scf_hash[self.cnts_hash[cntname]]
+        scf = self.scaffolds[scfidx]
+        new_scfs = scf._break(cntname)
+        self._update(old=[scf], new=new_scfs)
+        self._hash_cnts()
+        pass
+        
     def _merge(self, cnt1name, cnt2name):
         scf1idx = self.scf_hash[self.cnts_hash[cnt1name]]
         scf2idx = self.scf_hash[self.cnts_hash[cnt2name]]
@@ -104,6 +112,7 @@ class Assembly:
         if (pair1 and pair2) and (cnt1.sign==1 and cnt2.sign==1):
             pair1[0]._join(cnt2)
         self._update(old=[scf1, scf2], new=pair1+pair2)
+        self._hash_cnts()
         pass
 
     def _update(self, old=[], new=[]):
