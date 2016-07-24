@@ -60,7 +60,7 @@ class Assembly:
     def __init__(self, name, scaffolds = []):
         self.scaffolds = scaffolds
         self.name = name
-        self.scf_hash = {cnt:self.scaffolds.index(scf) for scf in scaffolds}
+        self.scf_hash = {scf:self.scaffolds.index(scf) for scf in scaffolds}
         self.seqs = None
     @staticmethod
     def with_links(name, links):
@@ -69,7 +69,7 @@ class Assembly:
     def _update(self, old=[], new=[]):
         map(lambda x: self.scaffolds.pop(x), [self.scf_hash[scf] for scf in old])
         map(lambda x: self.scaffolds.append(x), [self.scf_hash[scf] for scf in new])
-        self.scf_hash = {cnt:self.scaffolds.index(scf) for scf in scaffolds}
+        self.scf_hash = {scf:self.scaffolds.index(scf) for scf in scaffolds}
         return
 
     def _getSeq(self, fileSeq):
