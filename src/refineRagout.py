@@ -73,7 +73,7 @@ class Assembly:
         return
 
     def _getSeq(self, fileSeq):
-        self.seqs = read_fasta_dict(fileSeq)
+        self.seqs = fasta_parser(fileSeq)
         pass
 
 def parse_links(links):
