@@ -43,11 +43,12 @@ class Scaffold:
     def _break(self, cntName, slide=1):
         """
         break to the rights: slide +1
-        break to the left: slide -1
+        break to the left: slide 0
         """
         try:
             cnt_idx = self.hash_cnts[cntName]
             cnts1 = self.contigs[:cnt_idx+slide]
+            cnts1[-1].link = 0
             cnts2 = self.contigs[cnt_idx+slide:]
             name1 = "%s.broken.%s.1" %(self.name, cntName)
             name2 = "%s.broken.%s.2" %(self.name, cntName)
@@ -72,16 +73,21 @@ class Assembly:
     def __init__(self, name, scaffolds = []):
         self.scaffolds = scaffolds
         self.name = name
-        self.scf_hash = {scf.name:self.scaffolds.index(scf) for scf in scaffolds}
+        self.scf_hash = {scf.name:self.scaffolds.index(scf) for scf in self.scaffolds}
+        self.cnts_hash = {cnt.uname:scf.name for cnt in scf.contigs for scf in self.scaffolds}
+
         self.seqs = dict()
     @staticmethod
     def with_links(name, links):
         return Assembly(name, scaffolds = parse_links(links))
 
+    @staticmethod
+    def _merge(cnt1, cnt2):
+
     def _update(self, old=[], new=[]):
-        map(lambda x: self.scaffolds.pop(x), [self.scf_hash[scf] for scf in old])
-        map(lambda x: self.scaffolds.append(x), [self.scf_hash[scf] for scf in new])
-        self.scf_hash = {scf:self.scaffolds.index(scf) for scf in scaffolds}
+        map(lambda x: self.scaffolds.pop(x), [self.scf_hash[scf.name] for scf in old])
+        self.scaffolds+=new
+        self.scf_hash = {scf.name:self.scaffolds.index(scf) for scf in self.scaffolds}
         return
 
     def _getSeq(self, fileSeq):
