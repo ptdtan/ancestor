@@ -23,6 +23,7 @@ class Contig:
         else:
             self.sign = -1
         self.supporting_genomes = supported
+
 class Scaffold:
     def __init__(self, name, contigs):
         self.contigs = contigs
@@ -75,9 +76,9 @@ class Scaffold:
         sequence = []
         for cnt in self.contigs:
             if cnt.sign == 1:
-                sequence.append(''.join([cnt.seq.Seq,'N'*cnt.link]))
+                sequence.append(''.join([str(cnt.seq),'N'*cnt.link]))
             else:
-                sequence.append(''.join([ul.reverse_complement(cnt.seq.Seq), 'N'*cnt.link]))
+                sequence.append(''.join([ul.reverse_complement(str(cnt.seq), 'N'*cnt.link]))
         self.seq = ''.join(sequence)
         pass
 
@@ -205,6 +206,7 @@ def parse_links(links):
                               link = int(gap), sign=name[0], supported = _))
         assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
+
 def parse_adjacency(filename):
     adj = {}
     for line in open(filename):
