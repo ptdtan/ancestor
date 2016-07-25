@@ -1,12 +1,12 @@
 MIN_GAP_SIZE = 11
-#from ultilities import *
+
 import ultilities as ul
 from collections import defaultdict
 from Bio import SeqIO
 from copy import copy
 
 class Contig:
-    def __init__(self, uname=None, seq=None, start = 0, end = 0 ,
+    def __init__(self, uname=None, seq=None,
                  link=MIN_GAP_SIZE, sign="+", region=(0,0)):
         self.uname = uname
         if "[" in uname:
@@ -15,12 +15,9 @@ class Contig:
             self.name = uname
         self.seq = seq
         self.link = link
-        self.start = start
+        self.start = region[0]
+        self.end = region[1]
         self.region = region
-        if seq:
-            self.end = len(seq)
-        else:
-            self.end = end
         if sign == "+":
             self.sign = 1
         else:
@@ -169,10 +166,9 @@ def parse_links(links):
             if "[" in name:
                 raw_region = name[name.index("[")+1:name.index("]")]
                 region = tuple(map(int, raw_region.split(":")))
-                contigs.append(Contig(uname=name[1:],  start = int(start), end = int(end),
-                                  link = int(gap), sign=name[0], region=region))
+                contigs.append(Contig(uname=name[1:], link = int(gap), sign=name[0], region=region))
             else:
-                contigs.append(Contig(uname=name[1:], start = int(start), end = int(end),
+                contigs.append(Contig(uname=name[1:], region = (0,end-start+1),
                               link = int(gap), sign=name[0]))
         assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
