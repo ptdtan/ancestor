@@ -7,7 +7,7 @@ from copy import copy
 
 class Contig:
     def __init__(self, uname=None, seq=None,
-                 link=MIN_GAP_SIZE, sign="+", region=(0,0)):
+                 link=MIN_GAP_SIZE, sign="+", region=(0,0), supported = ""):
         self.uname = uname
         if "[" in uname:
             self.name = uname[:uname.index("[")]
@@ -22,7 +22,7 @@ class Contig:
             self.sign = 1
         else:
             self.sign = -1
-
+        self.supporting_genomes = supported
 class Scaffold:
     def __init__(self, name, contigs):
         self.contigs = contigs
@@ -171,6 +171,12 @@ class Assembly:
         if cntidx2 - cntidx1 == 1:
             return False
 
+    def _output_generate(self, filename):
+        assembly_fasta = dict()
+        for scf in self.scaffolds:
+            assembly_fasta[scf.name] = scf.seq
+        ul.write_fasta_dict(fasta_dict=assembly_fasta, filename=filename)
+        pass
 def parse_links(links):
     """Parser for scaffolds_links file
     @param ifile: _scaffolds.links file
@@ -187,18 +193,20 @@ def parse_links(links):
                 name, start, end , gap, _ = cnt_raw.strip().split("\t")
             except ValueError:
                 name, start, end , gap = cnt_raw.strip().split("\t")
+                _ = ""
             if "[" in name:
                 raw_region = name[name.index("[")+1:name.index("]")]
                 region = tuple(map(int, raw_region.split(":")))
-                contigs.append(Contig(uname=name[1:], link = int(gap), sign=name[0], region=region))
+                contigs.append(Contig(uname=name[1:], link = int(gap),
+                                      sign=name[0], region=region, supported = _ ))
             else:
                 contigs.append(Contig(uname=name[1:], region = (0,int(end)),
-                              link = int(gap), sign=name[0]))
+                              link = int(gap), sign=name[0], supported = _))
         assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
 def parse_adjacency(filename):
     adj = {}
     for line in open(filename):
-        left, right, _ = line.strip().split("\t")
+        left, right = line.strip().split("\t")
         adj[left] = right
     return adj
