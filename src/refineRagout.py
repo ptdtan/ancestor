@@ -78,7 +78,7 @@ class Scaffold:
             if cnt.sign == 1:
                 sequence.append(''.join([str(cnt.seq),'N'*cnt.link]))
             else:
-                sequence.append(''.join([ul.reverse_complement(str(cnt.seq), 'N'*cnt.link]))
+                sequence.append(''.join([ul.reverse_complement(str(cnt.seq)), 'N'*cnt.link]))
         self.seq = ''.join(sequence)
         pass
 
