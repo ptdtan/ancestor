@@ -80,6 +80,7 @@ class Scaffold:
                 sequence.append(''.join([ul.reverse_complement(cnt.seq), 'N'*cnt.link]))
         self.seq = ''.join(sequence)
         pass
+
 class Assembly:
     def __init__(self, name, scaffolds = []):
         self.scaffolds = scaffolds
@@ -87,6 +88,7 @@ class Assembly:
         self.scf_hash = {scf.name:self.scaffolds.index(scf) for scf in self.scaffolds}
         self.cnts_hash = self._hash_cnts()
         self.seqs = dict()
+
     @staticmethod
     def with_links(name, links):
         return Assembly(name, scaffolds = parse_links(links))
@@ -141,11 +143,33 @@ class Assembly:
     def _validate(self):
         scf_lens = list()
         for scf in self.scaffolds:
-            scf_len = sum([len(cnt.seq)+cnt.link for cnt in scf.contigs])
+            scf_len = sum([cnt.end - cnt.start + cnt.link for cnt in scf.contigs])
             scf_lens.append(scf_len)
         n50 = ul._calc_n50(scf_lens, sum(scf_lens))
         print "N50: %d" %(n50)
+        return n50
+
+    def _chain_explotion(self, adj):
+        for key, value in adj.items():
+            if self._check_consistent(key, value):
+                self._split(key)
+            if self._validate() < 100000000:
+                break
+                print "Done refine!"
         pass
+
+    def _check_consistent(self, cnt1, cnt2):
+        try:
+            scfidx1 = self.cnts_hash[cnt1]
+            scfidx2 = self.cnts_hash[cnt2]
+        except KeyError:
+            return False
+        if scfidx1 != scfidx2:
+            return True # tricky
+        scf = self.scaffolds[self.scf_hash[scfidx1]]
+        cntidx1, cntidx2 = scf.hash_cnts[cnt1], scf.hash_cnts[cnt1]
+        if cntidx2 - cntidx1 == 1:
+            return False
 
 def parse_links(links):
     """Parser for scaffolds_links file
@@ -168,7 +192,13 @@ def parse_links(links):
                 region = tuple(map(int, raw_region.split(":")))
                 contigs.append(Contig(uname=name[1:], link = int(gap), sign=name[0], region=region))
             else:
-                contigs.append(Contig(uname=name[1:], region = (0,int(end)-int(start)+1),
+                contigs.append(Contig(uname=name[1:], region = (0,int(end)),
                               link = int(gap), sign=name[0]))
         assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
+def parse_adjacency(filename):
+    adj = {}
+    for line in open(filename):
+        left, right, _ = line.strip().split("\t")
+        adj[left] = right
+    return adj
