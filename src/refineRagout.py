@@ -168,7 +168,7 @@ def parse_links(links):
                 region = tuple(map(int, raw_region.split(":")))
                 contigs.append(Contig(uname=name[1:], link = int(gap), sign=name[0], region=region))
             else:
-                contigs.append(Contig(uname=name[1:], region = (0,end-start+1),
+                contigs.append(Contig(uname=name[1:], region = (0,int(end)-int(start)+1),
                               link = int(gap), sign=name[0]))
         assembly.append(Scaffold(name = arr[0], contigs = contigs))
     return assembly
