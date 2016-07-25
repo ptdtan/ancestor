@@ -1,3 +1,8 @@
+"""
+framework for refining Ragout's scaffolds by using read-pair mapping information.
+@ptdtan
+"""
+
 MIN_GAP_SIZE = 11
 
 import ultilities as ul
@@ -83,6 +88,17 @@ class Scaffold:
         pass
 
 class Assembly:
+    """
+    basic Usage:
+    ass = Assembly.with_links("ghaGan1", "/path/to/ghaGan1_scaffolds.links") # tab-delimiter
+    ass._chain_explotion(adjacency) #adjacency : returned from parse_adjacency("/path/to/adjacency/file")
+    #until N50 < 100M
+    ass._getSeq("/path/to/ghaGan1.fa")
+    ass._addSeq()
+    for scf in  ass.scaffolds:
+        scf._to_sequence()
+    ass._output_generate(filename="/path/to/output/ghaGan1.release.fasta")
+    """
     def __init__(self, name, scaffolds = []):
         self.scaffolds = scaffolds
         self.name = name
@@ -102,6 +118,12 @@ class Assembly:
         return ret
 
     def _split(self, cntname):
+        """
+        split scaffold to 2 part
+        1: start to cnt
+        2: cnt+1 to end
+        then update and re-generate hash_cnts
+        """
         scfidx = self.scf_hash[self.cnts_hash[cntname]]
         scf = self.scaffolds[scfidx]
         new_scfs = scf._break(cntname)
@@ -110,6 +132,12 @@ class Assembly:
         pass
 
     def _merge(self, cnt1name, cnt2name):
+        """
+        merge two contigs cnt1 and cnt2:
+        - break scaffolds of cnt1 and cnt2 to 2 fragments, return 4 fragments
+        - join frag1 of scf1 with cnt2
+        - update scaffolds, and re-generate hash_cnts
+        """
         scf1idx = self.scf_hash[self.cnts_hash[cnt1name]]
         scf2idx = self.scf_hash[self.cnts_hash[cnt2name]]
         scf1, scf2 = self.scaffolds[scf1idx], self.scaffolds[scf2idx]
@@ -147,7 +175,6 @@ class Assembly:
             scf_len = sum([cnt.end - cnt.start + cnt.link for cnt in scf.contigs])
             scf_lens.append(scf_len)
         n50 = ul._calc_n50(scf_lens, sum(scf_lens))
-        print "N50: %d" %(n50)
         return n50
 
     def _chain_explotion(self, adj):
@@ -156,10 +183,13 @@ class Assembly:
                 self._split(key)
             if self._validate() < 100000000:
                 break
-                print "Done refine!"
         pass
 
     def _check_consistent(self, cnt1, cnt2):
+        """
+        Only allow 2 contigs in regular orientation, 1 is forward and the other is reverse_complement
+        and 2 contigs came from 2 different scaffolds
+        """
         try:
             scfidx1 = self.cnts_hash[cnt1]
             scfidx2 = self.cnts_hash[cnt2]
