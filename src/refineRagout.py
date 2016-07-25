@@ -6,7 +6,7 @@ from Bio import SeqIO
 from copy import copy
 
 class Contig:
-    def __init__(self, uname=None, seq=None,
+    def __init__(self, uname=None, seq="",
                  link=MIN_GAP_SIZE, sign="+", region=(0,0), supported = ""):
         self.uname = uname
         if "[" in uname:
@@ -75,9 +75,9 @@ class Scaffold:
         sequence = []
         for cnt in self.contigs:
             if cnt.sign == 1:
-                sequence.append(''.join([cnt.seq.seq,'N'*cnt.link]))
+                sequence.append(''.join([cnt.seq.Seq,'N'*cnt.link]))
             else:
-                sequence.append(''.join([ul.reverse_complement(cnt.seq.seq), 'N'*cnt.link]))
+                sequence.append(''.join([ul.reverse_complement(cnt.seq.Seq), 'N'*cnt.link]))
         self.seq = ''.join(sequence)
         pass
 
@@ -177,6 +177,7 @@ class Assembly:
             assembly_fasta[scf.name] = scf.seq
         ul.write_fasta_dict(fasta_dict=assembly_fasta, filename=filename)
         pass
+
 def parse_links(links):
     """Parser for scaffolds_links file
     @param ifile: _scaffolds.links file
