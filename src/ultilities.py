@@ -27,6 +27,13 @@ def write_fasta_dict(fasta_dict, filename):
             for i in range(0, len(fasta_dict[header]), 60):
                 f.write(fasta_dict[header][i:i + 60] + "\n")
 
+def parse_adjacency(filename):
+    adj = {}
+    lines = open(filename).read().strip().split("\n")
+    for line in lines:
+        left, right = line.strip().split("\t")
+        adj[left] = right
+    return adj
 
 COMPL = maketrans("ATGCURYKMSWBVDHNXatgcurykmswbvdhnx",
                   "TACGAYRMKSWVBHDNXtacgayrmkswvbhdnx")
