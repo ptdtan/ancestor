@@ -1,0 +1,21 @@
+Adjacency  "Estimated Gap Size"
+-scaffold78 -C15957332 24
++C16631739 -scaffold34425 51
++scaffold6707 +C16699422 58
++scaffold28084 -scaffold17054[0:146583] 65
+-scaffold15978 -scaffold41241 67
+-scaffold7164 -scaffold24171 67
++scaffold17564 +scaffold8800 69
+-scaffold33295 +C16870580 77
+-C16754508 +scaffold3680[0:258536] 77
++scaffold31622 -scaffold17058 77
++scaffold32631 -C16687037 79
+-scaffold39990 -C16841336 80
++scaffold37565 +scaffold25465 83
+-scaffold5596 -C16699346 83
++scaffold368 -scaffold32962 84
+-scaffold28505 +scaffold20551 86
+-C16767974 -scaffold33811 89
++scaffold8952[36971:228273] -scaffold19313 95
++scaffold8229[0:523386] +scaffold37215 97
+-scaffold6555 -scaffold40815 108
