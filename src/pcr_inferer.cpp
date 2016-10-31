@@ -15,13 +15,13 @@ int main(int argc, char *argv[])
     int count=0;
     unsigned short sumInsertsize=0;
     bool flag = false;
-	std::string filename = argv[1], chr = argv[2];
+    std::string filename = argv[1], chr = argv[2];
     BamTools::BamReader reader;
 
     std::stringstream(argv[3]) >> uRstart;
     std::stringstream(argv[4]) >> uWall;
     std::stringstream(argv[5]) >> uLen;
-    //std::stringstream(argv[6]) >> uMean;
+    std::stringstream(argv[6]) >> uMean;
     uRend = uWall + uLen;
 
     //open BAM and its index
@@ -42,14 +42,10 @@ int main(int argc, char *argv[])
     BamTools::BamAlignment al;
     //do the job
     while ( reader.GetNextAlignment(al) ){
-		if (al.MatePosition > uWall && al.MatePosition < uRend){
-			cout << "True" << endl;
-			flag = true;
-			break;
+        if (al.MatePosition > uWall && al.MatePosition < uRend){
+            sumInsertsize+=abs(al.InsertSize)-uGap;
+            count++;
         }
-	}
-	if (!flag)
-		cout << "False" << endl;
-		//std::cout << std::fixed << sumInsertsize/count;
+    }
+    std::cout << std::fixed << sumInsertsize/count << endl;
 }
-
